@@ -1,0 +1,13 @@
+node_modules/
+dist/
+dist-server/
+.codex-docx-render/
+.playwright-cli/
+output/
+tmp/
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
