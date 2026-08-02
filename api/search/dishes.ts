@@ -15,11 +15,9 @@ export default async function handler(request: ApiRequest, response: ApiResponse
 
   try {
     const gateway = createAiGateway({
-      apiKey: process.env.OPENAI_NEXT_API_KEY,
-      baseUrl: process.env.OPENAI_NEXT_BASE_URL,
-      textModel: process.env.AI_TEXT_MODEL,
-      visionModel: process.env.AI_VISION_MODEL,
-      fallbackModel: process.env.AI_FALLBACK_MODEL,
+      apiKey: process.env.ADVISOR_API_KEY,
+      baseUrl: process.env.ADVISOR_BASE_URL,
+      model: process.env.ADVISOR_MODEL,
     })
     const body = typeof request.body === 'string' ? JSON.parse(request.body) : request.body
     return response.status(200).json(await gateway.searchWebDishes((body || {}) as WebDishSearchRequest))

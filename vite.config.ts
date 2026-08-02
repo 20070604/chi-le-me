@@ -16,14 +16,9 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       aiApiPlugin({
-        apiKey: env.OPENAI_NEXT_API_KEY,
-        baseUrl: env.OPENAI_NEXT_BASE_URL,
-        textModel: env.AI_TEXT_MODEL,
-        visionModel: env.AI_VISION_MODEL,
-        fallbackModel: env.AI_FALLBACK_MODEL,
-        chatFastModel: env.AI_CHAT_FAST_MODEL,
-        chatBalancedModel: env.AI_CHAT_BALANCED_MODEL,
-        chatDeepModel: env.AI_CHAT_DEEP_MODEL,
+        apiKey: env.ADVISOR_API_KEY,
+        baseUrl: env.ADVISOR_BASE_URL,
+        model: env.ADVISOR_MODEL,
       }),
     ],
   }

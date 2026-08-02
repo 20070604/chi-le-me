@@ -7,14 +7,9 @@ const host = process.env.HOST || '127.0.0.1'
 const maxBodyBytes = 12_000_000
 
 const gateway = createAiGateway({
-  apiKey: process.env.OPENAI_NEXT_API_KEY,
-  baseUrl: process.env.OPENAI_NEXT_BASE_URL,
-  textModel: process.env.AI_TEXT_MODEL,
-  visionModel: process.env.AI_VISION_MODEL,
-  fallbackModel: process.env.AI_FALLBACK_MODEL,
-  chatFastModel: process.env.AI_CHAT_FAST_MODEL,
-  chatBalancedModel: process.env.AI_CHAT_BALANCED_MODEL,
-  chatDeepModel: process.env.AI_CHAT_DEEP_MODEL,
+  apiKey: process.env.ADVISOR_API_KEY,
+  baseUrl: process.env.ADVISOR_BASE_URL,
+  model: process.env.ADVISOR_MODEL,
 })
 
 const handlers: Record<string, (payload: Record<string, unknown>) => Promise<unknown>> = {
@@ -39,11 +34,16 @@ const server = createServer(async (request, response) => {
     sendJson(response, 200, {
       ok: true,
       service: 'chi-le-me-api',
-      configured: Boolean(process.env.OPENAI_NEXT_API_KEY),
+      configured: Boolean(process.env.ADVISOR_API_KEY),
       models: {
-        text: process.env.AI_TEXT_MODEL || 'gpt-5.4-mini',
-        vision: process.env.AI_VISION_MODEL || 'gpt-5.4-mini',
-        advisor: process.env.AI_CHAT_FAST_MODEL || 'deepseek-v4-flash',
+        text: process.env.ADVISOR_MODEL || 'gpt-5.5-mini',
+        vision: process.env.ADVISOR_MODEL || 'gpt-5.5-mini',
+        search: process.env.ADVISOR_MODEL || 'gpt-5.5-mini',
+        advisor: process.env.ADVISOR_MODEL || 'gpt-5.5-mini',
+      },
+      provider: {
+        baseUrl: process.env.ADVISOR_BASE_URL || 'https://uuapi.net/v1',
+        model: process.env.ADVISOR_MODEL || 'gpt-5.5-mini',
       },
     })
     return

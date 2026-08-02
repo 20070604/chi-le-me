@@ -1,6 +1,7 @@
-const CACHE = 'chileme-v37-brand-copy'
+const CACHE = 'chileme-v38-favicon'
 const APP_SHELL = [
-  '/', '/taste', '/studio', '/advisor', '/manifest.webmanifest', '/icon.svg',
+  '/', '/taste', '/studio', '/advisor', '/manifest.webmanifest',
+  '/favicon-32x32.png', '/apple-touch-icon.png', '/icon-192x192.png', '/icon-512x512.png',
   '/images/dishes/pickled-fish-soup.jpg',
   '/images/dishes/broccoli-shrimp.jpg',
   '/images/dishes/tomato-chicken-pasta.jpg',

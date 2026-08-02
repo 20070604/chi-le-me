@@ -1,14 +1,9 @@
-import { advisorDepthConfig, buildAdvisorMessages, resolveAdvisorDepth, type AdvisorDepth, type AdvisorRequest } from './tasteAdvisorSkill'
+import { advisorDepthConfig, buildAdvisorMessages, resolveAdvisorDepth, type AdvisorRequest } from './tasteAdvisorSkill'
 
 export interface AiGatewayConfig {
   apiKey?: string
   baseUrl?: string
-  textModel?: string
-  visionModel?: string
-  fallbackModel?: string
-  chatFastModel?: string
-  chatBalancedModel?: string
-  chatDeepModel?: string
+  model?: string
   timeoutMs?: number
 }
 
@@ -90,28 +85,16 @@ interface ChatCompletionResponse {
   choices?: Array<{ message?: { content?: string | Array<{ type?: string; text?: string }> } }>
 }
 
-const DEFAULT_BASE_URL = 'https://api.openai-next.com/v1'
-const DEFAULT_TEXT_MODEL = 'gpt-5.4-mini'
-const DEFAULT_VISION_MODEL = 'gpt-5.4-mini'
-const DEFAULT_FALLBACK_MODEL = 'gpt-5.6-terra'
-const DEFAULT_CHAT_FAST_MODEL = 'deepseek-v4-flash'
-const DEFAULT_CHAT_BALANCED_MODEL = 'qwen3.5-plus'
-const DEFAULT_CHAT_DEEP_MODEL = 'gpt-5.6-terra'
+const DEFAULT_BASE_URL = 'https://uuapi.net/v1'
+const DEFAULT_MODEL = 'gpt-5.5-mini'
 
 export function createAiGateway(config: AiGatewayConfig) {
   const apiKey = config.apiKey?.trim()
   const baseUrl = (config.baseUrl || DEFAULT_BASE_URL).replace(/\/$/, '')
-  const textModel = config.textModel || DEFAULT_TEXT_MODEL
-  const visionModel = config.visionModel || DEFAULT_VISION_MODEL
-  const fallbackModel = config.fallbackModel || DEFAULT_FALLBACK_MODEL
-  const chatModels: Record<AdvisorDepth, string> = {
-    quick: config.chatFastModel || DEFAULT_CHAT_FAST_MODEL,
-    balanced: config.chatBalancedModel || DEFAULT_CHAT_BALANCED_MODEL,
-    deep: config.chatDeepModel || DEFAULT_CHAT_DEEP_MODEL,
-  }
+  const model = config.model || DEFAULT_MODEL
   const timeoutMs = config.timeoutMs || 18_000
 
-  const requestJson = async (model: string, messages: unknown[], maxTokens = 900) => {
+  const requestJson = async (messages: unknown[], maxTokens = 900) => {
     if (!apiKey) throw new Error('AI 服务密钥尚未配置')
 
     const controller = new AbortController()
@@ -138,23 +121,12 @@ export function createAiGateway(config: AiGatewayConfig) {
     }
   }
 
-  const withAccuracyFallback = async <T>(primaryModel: string, messages: unknown[], validate: (payload: Record<string, unknown>) => ModelAnswer<T>, confidenceThreshold = 0.76, maxTokens = 900) => {
-    let primaryError: unknown
-    let primaryValue: T | undefined
-    try {
-      const primary = validate(await requestJson(primaryModel, messages, maxTokens))
-      if (primary.confidence >= confidenceThreshold || fallbackModel === primaryModel) return primary.value
-      primaryValue = primary.value
-    } catch (error) {
-      primaryError = error
-    }
-
-    try {
-      return validate(await requestJson(fallbackModel, messages, maxTokens)).value
-    } catch (fallbackError) {
-      if (primaryValue !== undefined) return primaryValue
-      throw fallbackError || primaryError || new Error('AI 模型暂时不可用')
-    }
+  const requestValidated = async <T>(
+    messages: unknown[],
+    validate: (payload: Record<string, unknown>) => ModelAnswer<T>,
+    maxTokens = 900,
+  ) => {
+    return validate(await requestJson(messages, maxTokens)).value
   }
 
   const analyzeTaste = async (input: TasteRequest) => {
@@ -186,7 +158,7 @@ export function createAiGateway(config: AiGatewayConfig) {
     ]
 
     const candidateIds = new Set(candidates.map((item) => item.id))
-    return withAccuracyFallback(textModel, messages, (payload) => {
+    return requestValidated(messages, (payload) => {
       const rawItems = Array.isArray(payload.items) ? payload.items : []
       const items = rawItems.flatMap((raw) => {
         if (!raw || typeof raw !== 'object') return []
@@ -198,7 +170,7 @@ export function createAiGateway(config: AiGatewayConfig) {
       }).slice(0, 5)
       if (!items.length) throw new Error('模型没有返回有效菜品')
       return { confidence: clamp(Number(payload.confidence), 0, 1), value: { items } }
-    })
+    }, 900)
   }
 
   const scanPantry = async (input: PantryRequest) => {
@@ -219,7 +191,7 @@ export function createAiGateway(config: AiGatewayConfig) {
       },
     ]
 
-    return withAccuracyFallback(visionModel, messages, (payload) => {
+    return requestValidated(messages, (payload) => {
       const rawIngredients = Array.isArray(payload.ingredients) ? payload.ingredients : []
       const seen = new Set<string>()
       const ingredients = rawIngredients.flatMap((raw) => {
@@ -235,7 +207,7 @@ export function createAiGateway(config: AiGatewayConfig) {
       const strongest = ingredients[0]?.confidence || 0
       const modelConfidence = clamp(Number(payload.confidence), 0, 1)
       return { confidence: Math.max(modelConfidence, strongest * 0.9), value: { ingredients, recipeQuery: `${ingredients.map((item) => item.name).join('、')} 家常菜 菜谱`, recipeIdeas } }
-    }, 0.66, 500)
+    }, 500)
   }
 
   const searchWebDishes = async (input: WebDishSearchRequest) => {
@@ -265,11 +237,11 @@ export function createAiGateway(config: AiGatewayConfig) {
     ]
 
     const suppliedIdeas = normalizeDishIdeas(input.ideas, limit).filter((idea) => !excludedNames.has(normalizeDishName(idea.name)))
-    const ideas = suppliedIdeas.length >= 2 ? suppliedIdeas : await withAccuracyFallback(textModel, messages, (payload) => {
+    const ideas = suppliedIdeas.length >= 2 ? suppliedIdeas : await requestValidated(messages, (payload) => {
       const value = normalizeDishIdeas(payload.ideas, limit).filter((idea) => !excludedNames.has(normalizeDishName(idea.name)))
       if (value.length < 2) throw new Error('模型没有生成有效检索词')
       return { confidence: clamp(Number(payload.confidence), 0, 1), value }
-    }, 0.76, 650)
+    }, 650)
 
     const items = (await Promise.all(ideas.map((idea, index) => findRecipeSource(idea, index))))
       .filter((item): item is WebDishSearchItem => Boolean(item))
@@ -312,7 +284,7 @@ export function createAiGateway(config: AiGatewayConfig) {
       },
     ]
 
-    const metadata = await withAccuracyFallback(textModel, messages, (payload) => {
+    const metadata = await requestValidated(messages, (payload) => {
       const nutrition = payload.nutrition && typeof payload.nutrition === 'object' ? payload.nutrition as Record<string, unknown> : {}
       const generatedSteps = Array.isArray(payload.steps) ? payload.steps.filter((step): step is string => typeof step === 'string' && step.trim().length > 3).slice(0, 8) : []
       const highlights = Array.isArray(payload.highlights) ? payload.highlights.filter((item): item is string => typeof item === 'string' && Boolean(item.trim())).slice(0, 3) : []
@@ -334,7 +306,7 @@ export function createAiGateway(config: AiGatewayConfig) {
         generatedSteps,
       }
       return { confidence: clamp(Number(payload.confidence), 0, 1), value }
-    }, 0.7, 900).catch(() => ({
+    }, 900).catch(() => ({
       timeMinutes: 30,
       difficulty: '适中' as const,
       region: '家常风味',
@@ -372,10 +344,9 @@ export function createAiGateway(config: AiGatewayConfig) {
     const depth = resolveAdvisorDepth(input.depth, message)
     const startedAt = Date.now()
     const maxTokens = depth === 'quick' ? 620 : depth === 'balanced' ? 900 : 1_250
-    const confidenceThreshold = depth === 'quick' ? 0.68 : depth === 'balanced' ? 0.75 : 0.8
     const messages = buildAdvisorMessages({ ...input, message }, depth)
 
-    const result = await withAccuracyFallback(chatModels[depth], messages, (payload) => {
+    const validateAdvisor = (payload: Record<string, unknown>) => {
       const answer = typeof payload.answer === 'string' ? payload.answer.trim().slice(0, 360) : ''
       if (!answer) throw new Error('味觉顾问没有返回有效回答')
 
@@ -404,7 +375,8 @@ export function createAiGateway(config: AiGatewayConfig) {
         confidence: clamp(Number(payload.confidence), 0, 1),
         value: { answer, dimensions, assumptions, followUps },
       }
-    }, confidenceThreshold, maxTokens)
+    }
+    const result = validateAdvisor(await requestJson(messages, maxTokens)).value
 
     return {
       ...result,

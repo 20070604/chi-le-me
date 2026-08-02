@@ -23,7 +23,7 @@ body { color: var(--flag-ink); background: #e7e9ed; }
 .app-frame { min-height: 100dvh; padding: 0; display: block; background: #e7e9ed; }
 .app-shell { width: min(100%, 460px); min-height: 100dvh; background: var(--flag-bg); overscroll-behavior-y: contain; }
 .page { background: var(--flag-bg); }
-.app-shell main.page { animation: flagshipPageIn var(--flag-medium) var(--flag-ease) both; }
+.app-shell main.page { animation: flagshipPageIn var(--flag-medium) var(--flag-ease); }
 
 .sr-only {
   position: absolute;
@@ -678,7 +678,8 @@ textarea:focus-visible {
 
 @keyframes flagshipPageIn {
   from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
+  /* Restore a real `none` value so fixed toolbars keep using the viewport. */
+  to { opacity: 1; transform: none; }
 }
 @keyframes flagshipImageIn {
   from { opacity: .68; transform: scale(1.035); }
