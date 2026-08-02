@@ -15,7 +15,6 @@
   <img src="https://img.shields.io/badge/Vite-5-646cff?style=flat-square&logo=vite" alt="vite" />
   <img src="https://img.shields.io/badge/Node.js-22-339933?style=flat-square&logo=nodedotjs" alt="node" />
   <img src="https://img.shields.io/badge/pnpm-10-F69220?style=flat-square&logo=pnpm" alt="pnpm" />
-  <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="license" />
 </p>
 
 ---
