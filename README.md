@@ -329,7 +329,6 @@ server {
 ## 设计理念
 
 - **真实食物摄影** — 所有菜品图片使用真实照片，拒绝插画和 emoji
-- **渐变梦幻 + 玻璃拟态** — 年轻化视觉风格，宽间距布局
 - **可解释的推荐** — 每条推荐附带具体理由，而非黑盒输出
 - **个人菜单库** — 搜索结果写入浏览器本地缓存，越用越准
 - **营养闭环** — 推荐 → 记录 → 分析缺口 → 再推荐
@@ -365,11 +364,6 @@ pnpm build
 
 菜品图片来自 [Unsplash](https://unsplash.com) / [Pexels](https://pexels.com) 等开放版权平台，详见 [`public/images/dishes/ATTRIBUTION.md`](public/images/dishes/ATTRIBUTION.md)。
 
----
-
-## 许可证
-
-本项目基于 [MIT](LICENSE) 协议开源。
 
 ---
 
