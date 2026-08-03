@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/logo.jpg" alt="吃了么 Logo" width="120" />
+  <img src="public/icon-512x512.png" alt="吃了么 Logo" width="120" />
 </p>
 
 <h1 align="center">吃了么 · Chi Le Me</h1>
@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="http://eat.wanfengtech.fun"><img src="https://img.shields.io/badge/Live_Demo-eat.wanfengtech.fun-ff6b6b?style=flat-square" alt="demo" /></a>
+  <a href="https://eat.wanfengtech.fun/taste"><img src="https://img.shields.io/badge/Live_Demo-eat.wanfengtech.fun-ff6b6b?style=flat-square" alt="demo" /></a>
   <img src="https://img.shields.io/badge/React-18-61dafb?style=flat-square&logo=react" alt="react" />
   <img src="https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square&logo=typescript" alt="typescript" />
   <img src="https://img.shields.io/badge/Vite-5-646cff?style=flat-square&logo=vite" alt="vite" />
@@ -30,7 +30,9 @@
 ## 页面预览
 
 <p align="center">
-  <img src="public/images/heroshot.jpg" alt="吃了么首页截图" width="280" />
+  <a href="https://eat.wanfengtech.fun/taste">
+    <img src="public/images/heroshot.png" alt="吃了么首页截图" width="720" />
+  </a>
 </p>
 
 <details>
@@ -161,11 +163,12 @@ ADVISOR_MODEL=gpt-5.5-mini
 chi-le-me/
 ├── public/
 │   ├── images/              # 菜品图片（Unsplash / Pexels 开放版权）
+│   │   ├── heroshot.png     # README 首页预览
 │   │   ├── dishes/          # 菜品图
 │   │   ├── heroes/          # 英雄图
 │   │   └── home/            # 首页场景图（早/午/晚餐）
 │   ├── videos/              # 视频素材
-│   └── logo.jpg
+│   └── icon-512x512.png     # README Logo / PWA 图标
 ├── server/
 │   ├── aiGateway.ts         # AI 网关核心（多模型路由、置信度回退、菜谱检索）
 │   ├── production.ts        # 生产环境 HTTP 服务入口
