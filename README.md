@@ -29,11 +29,20 @@
 
 ## 页面预览
 
-<p align="center">
-  <a href="https://eat.wanfengtech.fun/taste">
-    <img src="public/images/heroshot.png" alt="吃了么首页截图" width="720" />
-  </a>
-</p>
+<table>
+  <tr>
+    <td align="center"><a href="https://eat.wanfengtech.fun/taste"><img src="public/images/previews/taste.png" alt="吃了么首页" width="210" /></a></td>
+    <td align="center"><a href="https://eat.wanfengtech.fun/studio"><img src="public/images/previews/studio.png" alt="吃了么厨房" width="210" /></a></td>
+    <td align="center"><a href="https://eat.wanfengtech.fun/diary"><img src="public/images/previews/diary.png" alt="吃了么膳食记录" width="210" /></a></td>
+    <td align="center"><a href="https://eat.wanfengtech.fun/profile"><img src="public/images/previews/profile.png" alt="吃了么个人中心" width="210" /></a></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>首页</strong><br /><code>/taste</code></td>
+    <td align="center"><strong>厨房</strong><br /><code>/studio</code></td>
+    <td align="center"><strong>记录</strong><br /><code>/diary</code></td>
+    <td align="center"><strong>我的</strong><br /><code>/profile</code></td>
+  </tr>
+</table>
 
 <details>
 <summary>点击展开更多页面说明</summary>
@@ -163,7 +172,7 @@ ADVISOR_MODEL=gpt-5.5-mini
 chi-le-me/
 ├── public/
 │   ├── images/              # 菜品图片（Unsplash / Pexels 开放版权）
-│   │   ├── heroshot.png     # README 首页预览
+│   │   ├── previews/        # README 四页面预览
 │   │   ├── dishes/          # 菜品图
 │   │   ├── heroes/          # 英雄图
 │   │   └── home/            # 首页场景图（早/午/晚餐）
